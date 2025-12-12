@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predict Inventory Status</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.png') }}">
+    <style>
+        /* General Body Styling */
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color:#970747; /* Light background */
+            color: #333;
+            padding: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Container for the form */
+        .container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+        }
+
+        /* Headings */
+        h2 {
+            color: #007bff; /* Primary blue color */
+            text-align: center;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        /* Form Group Styling */
+        .form-group { 
+            margin-bottom: 15px; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .form-group label { 
+            display: block; 
+            font-weight: 500;
+            color: #555;
+            flex-basis: 40%; /* Allocate space for label */
+        }
+
+        .form-group input { 
+            padding: 10px; 
+            width: 55%; /* Allocate space for input */
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        /* Button Styling */
+        #get-prediction-btn { 
+            display: block;
+            width: 100%;
+            padding: 12px; 
+            background-color: #28a745; /* Green for action */
+            color: white; 
+            border: none; 
+            border-radius: 6px;
+            cursor: pointer; 
+            margin-top: 25px; 
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        #get-prediction-btn:hover {
+            background-color: #218838; /* Darker green on hover */
+        }
+        
+        #get-prediction-btn:active {
+            transform: scale(0.99);
+        }
+
+        /* Separator and Result Styling */
+        hr {
+            border: 0;
+            height: 1px;
+            background-image: linear-gradient(to right, rgba(0, 0, 0, 0), rgba(0, 123, 255, 0.75), rgba(0, 0, 0, 0));
+            margin: 30px 0;
+        }
+
+        h3 {
+            color: #007bff;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        #prediction-result { 
+            margin-top: 15px; 
+            padding: 20px; 
+            border: 1px solid #007bff; 
+            background-color: #e6f2ff; /* Light blue background for result box */
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>📊 Predict Inventory Status</h2>
+        <p>Enter the feature values below to predict the inventory status (0 or 1).</p>
+
+        <form id="inventory-form">
+            <div class="form-group">
+                <label for="Category">Category:</label>
+                <input type="text" id="Category"  required>
+            </div>
+            <div class="form-group">
+                <label for="Stock-Quantity">Stock Quantity:</label>
+                <input type="number" id="Stock-Quantity" required>
+            </div>
+            <div class="form-group">
+                <label for="Reorder-Level">Reorder Level:</label>
+                <input type="number" id="Reorder-Level" required>
+            </div>
+            <div class="form-group">
+                <label for="Reorder-Quantity">Reorder Quantity:</label>
+                <input type="number" id="Reorder-Quantity" required>
+            </div>
+            <div class="form-group">
+                <label for="Unit-Price">Unit Price ($):</label>
+                <input type="number" step="0.01" id="Unit-Price"  required>
+            </div>
+            <div class="form-group">
+                <label for="Sales-Volume">Sales Volume:</label>
+                <input type="number" id="Sales-Volume"  required>
+            </div>
+            <div class="form-group">
+                <label for="Inventory-Turnover-Rate">Turnover Rate:</label>
+                <input type="number" id="Inventory-Turnover-Rate" >
+            </div>
+            
+            <button type="button" id="get-prediction-btn">Get Prediction</button>
+        </form>
+
+        <hr>
+
+        <h3>📝 Prediction Result</h3>
+        <div id="prediction-result">
+            Awaiting feature input...
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('get-prediction-btn').addEventListener('click', function() {
+            const data = {
+                Category: document.getElementById('Category').value,
+                Stock_Quantity: parseInt(document.getElementById('Stock-Quantity').value),
+                Reorder_Level: parseInt(document.getElementById('Reorder-Level').value),
+                Reorder_Quantity: parseInt(document.getElementById('Reorder-Quantity').value),
+                Unit_Price: parseFloat(document.getElementById('Unit-Price').value),
+                Sales_Volume: parseInt(document.getElementById('Sales-Volume').value),
+                Inventory_Turnover_Rate: parseFloat(document.getElementById('Inventory-Turnover-Rate').value)
+            };
+
+            fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+             const message = (result && result.message) ? result.message : "No guidance available.";
+                document.getElementById('prediction-result').innerText = 
+                    `Predicted Inventory Status: ${result.prediction}\n\nAI Guidance:\n${message}`;
+            })
+
+            .catch(error => {
+                document.getElementById('prediction-result').innerText = 
+                    `Error: ${error.message}`;
+            });
+        });
+        </script>
+   </body>
+</html>
