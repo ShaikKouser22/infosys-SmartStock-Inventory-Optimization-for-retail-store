@@ -24,9 +24,8 @@ app = Flask(__name__)
 
 # 2. Load model and encoders once when the app starts (use absolute paths)
 base_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(base_dir, "grocery_model (2).pkl")  
-encoders_path = os.path.join(base_dir, "label_encoders (2).pkl")  
-
+model_path = os.path.join(base_dir, "grocery_model.pkl")  
+encoders_path = os.path.join(base_dir, "label_encoders.pkl")  
 
 model = None
 encoders = None
